@@ -65,12 +65,15 @@ public class GridManager : MonoBehaviour
 
     private void SpawnPlanes()
     {
+        Vector3 gridCenter = new Vector3((NumRows - 1) * gridSpaceSize / 2, 0, (NumCols - 1) * gridSpaceSize / 2);
+        Vector3 offset = -gridCenter;
+
         foreach (var planeData in _level.planes)
         {
             var row = planeData.row - 1;
             var col = planeData.column - 1;
             var tile = _tiles[row, col];
-            var position = tile.transform.position + Vector3.up * 0.12f;
+            var position = new Vector3(row * gridSpaceSize, 0, col * gridSpaceSize) + offset + Vector3.up * 0.12f;
 
             _rotation = GetRotationFromDirection(planeData.direction);
             var usedPlanePrefab = GetPlanePrefabFromColor(planeData.color);
@@ -108,6 +111,9 @@ public class GridManager : MonoBehaviour
     }
     private void GenerateGrid()
     {
+        Vector3 gridCenter = new Vector3((NumRows - 1) * gridSpaceSize / 2, 0, (NumCols - 1) * gridSpaceSize / 2);
+        Vector3 offset = -gridCenter;
+
         for (var x = 0; x < NumRows; x++)
         {
             for (var z = 0; z < NumCols; z++)
@@ -115,8 +121,8 @@ public class GridManager : MonoBehaviour
                 var tileData = _level.colored_tiles.Find(t => t.row == x + 1 && t.column == z + 1);
                 var usedTilePrefab = GetTilePrefabFromColor(tileData?.color ?? "E");
                 
-                _tiles[x, z] = Instantiate(usedTilePrefab, new Vector3(x * gridSpaceSize, 0, z * gridSpaceSize),
-                    Quaternion.identity, transform).GetComponent<Tile>();
+                Vector3 position = new Vector3(x * gridSpaceSize, 0, z * gridSpaceSize) + offset;
+                _tiles[x, z] = Instantiate(usedTilePrefab, position, Quaternion.identity, transform).GetComponent<Tile>();
                
                 _tiles[x, z].isColored = usedTilePrefab != tilePrefab;
                 _tiles[x, z].InitTile(x, z);
