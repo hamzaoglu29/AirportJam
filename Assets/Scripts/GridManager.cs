@@ -4,8 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class GridManager : MonoBehaviour
 {
-    // Add this line to import LevelData
-    using LevelData;
     public static GridManager Instance { get; private set; }
 
     [SerializeField] private GameObject tilePrefab;
@@ -33,8 +31,8 @@ public class GridManager : MonoBehaviour
     /// Gets the neighbors of a given tile.
     /// </summary>
     /// <param name="tile">The tile to get neighbors for.</param>
-    /// <returns>An enumerable of neighboring tiles.</returns>
-    public IEnumerable<Tile> Neighbors(Tile tile) => _neighborDictionary[tile];
+    /// <returns>An array of neighboring tiles.</returns>
+    public Tile[] Neighbors(Tile tile) => _neighborDictionary[tile];
     
     private void Awake()
     {
@@ -69,8 +67,9 @@ public class GridManager : MonoBehaviour
     {
         foreach (var planeData in _level.planes)
         {
-            var gridData = new GridData { row = planeData.row - 1, col = planeData.column - 1 };
-            var tile = _tiles[gridData.row, gridData.col];
+            var row = planeData.row - 1;
+            var col = planeData.column - 1;
+            var tile = _tiles[row, col];
             var position = tile.transform.position + Vector3.up * 0.12f;
 
             _rotation = GetRotationFromDirection(planeData.direction);
@@ -79,8 +78,8 @@ public class GridManager : MonoBehaviour
             var plane = Instantiate(usedPlanePrefab, position, _rotation).GetComponent<Plane>();
             _planes.Add(plane);
             
-            plane.InitPlane(planeData.row - 1, planeData.column - 1, planeData.direction);
-            _tiles[gridData.row, gridData.col].isOccupied = true;
+            plane.InitPlane(row, col, planeData.direction);
+            _tiles[row, col].isOccupied = true;
         }
     }
 
@@ -113,8 +112,8 @@ public class GridManager : MonoBehaviour
         {
             for (var z = 0; z < NumCols; z++)
             {
-                var tileData = _level.colored_tiles[x * NumCols + z];
-                var usedTilePrefab = GetTilePrefabFromColor(tileData.color);
+                var tileData = _level.colored_tiles.Find(t => t.row == x + 1 && t.column == z + 1);
+                var usedTilePrefab = GetTilePrefabFromColor(tileData?.color ?? "E");
                 
                 _tiles[x, z] = Instantiate(usedTilePrefab, new Vector3(x * gridSpaceSize, 0, z * gridSpaceSize),
                     Quaternion.identity, transform).GetComponent<Tile>();
