@@ -2,12 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 public class GridManager : MonoBehaviour
 {
-    public static GridManager Instance;
+    public static GridManager Instance { get; private set; }
 
-    
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject redTilePrefab;
     [SerializeField] private GameObject blueTilePrefab;
@@ -17,24 +15,24 @@ public class GridManager : MonoBehaviour
     [SerializeField] private GameObject bluePlanePrefab;
     [SerializeField] private GameObject yellowPlanePrefab;
     [SerializeField] private GameObject greenPlanePrefab;
-    
-    private Tile[,] _tiles; 
-    private readonly List<Plane> _planes = new List<Plane>() ;
-    
-    //
-    private Dictionary<Tile, Tile[]> neighborDictionary;
-    public IEnumerable<Tile> Neighbors(Tile tile)
-    {
-        return neighborDictionary[tile];
-    }
-    //
+    [SerializeField] private float gridSpaceSize;
+
+    private Tile[,] _tiles;
+    private readonly List<Plane> _planes = new List<Plane>();
+    private Dictionary<Tile, Tile[]> _neighborDictionary;
     private LevelData _level;
-    public static int LevelIndex = 1;
     private Quaternion _rotation;
 
-    public int numRows;
-    public int numCols;
-    [SerializeField] private float gridSpaceSize;
+    public static int LevelIndex { get; set; } = 1;
+    public int NumRows { get; private set; }
+    public int NumCols { get; private set; }
+
+    /// <summary>
+    /// Gets the neighbors of a given tile.
+    /// </summary>
+    /// <param name="tile">The tile to get neighbors for.</param>
+    /// <returns>An enumerable of neighboring tiles.</returns>
+    public IEnumerable<Tile> Neighbors(Tile tile) => _neighborDictionary[tile];
     
     private void Awake()
     {
@@ -52,51 +50,60 @@ public class GridManager : MonoBehaviour
     private void Start()
     {
         LevelIndex = PlayerPrefs.GetInt("LevelIndex", LevelIndex);
-        var levelFile = Resources.Load<TextAsset>("Levels/level" + LevelIndex);
+        var levelFile = Resources.Load<TextAsset>($"Levels/level{LevelIndex}");
         _level = JsonUtility.FromJson<LevelData>(levelFile.text);
 
-        numRows = _level.row_count;
-        numCols = _level.column_count;
+        NumRows = _level.row_count;
+        NumCols = _level.column_count;
         
-        _tiles = new Tile[numRows, numCols];
-        //
-        neighborDictionary = new Dictionary<Tile, Tile[]>();
-        //
+        _tiles = new Tile[NumRows, NumCols];
+        _neighborDictionary = new Dictionary<Tile, Tile[]>();
+        
         GenerateGrid();
-        
+        SpawnPlanes();
+    }
+
+    private void SpawnPlanes()
+    {
         foreach (var planeData in _level.planes)
         {
-            var gridData=new GridData{row = planeData.row-1, col = planeData.column-1};
+            var gridData = new GridData { row = planeData.row - 1, col = planeData.column - 1 };
+            var tile = _tiles[gridData.row, gridData.col];
+            var position = tile.transform.position + Vector3.up * 0.12f;
 
-            var tile = _tiles[gridData.row,gridData.col];
-            var position = tile.transform.position+ Vector3.up * 0.12f;
-
-            _rotation = planeData.direction switch
-            {
-                "N" => Quaternion.Euler(0, -90, 0),
-                "E" => Quaternion.Euler(0, 0, 0),
-                "S" => Quaternion.Euler(0, 90, 0),
-                "W" => Quaternion.Euler(0, 180, 0),
-                _ => _rotation
-            };
-
-            var usedPlanePrefab = planeData.color switch
-            {
-                "B" => bluePlanePrefab,
-                "R" => redPlanePrefab,
-                "G" => greenPlanePrefab,
-                "Y" => yellowPlanePrefab,
-                _ => null
-            };
+            _rotation = GetRotationFromDirection(planeData.direction);
+            var usedPlanePrefab = GetPlanePrefabFromColor(planeData.color);
             
             var plane = Instantiate(usedPlanePrefab, position, _rotation).GetComponent<Plane>();
             _planes.Add(plane);
             
-            plane.InitPlane(planeData.row - 1, planeData.column - 1, planeData.direction /*planeData.color*/);
+            plane.InitPlane(planeData.row - 1, planeData.column - 1, planeData.direction);
             _tiles[gridData.row, gridData.col].isOccupied = true;
-            
-            
         }
+    }
+
+    private Quaternion GetRotationFromDirection(string direction)
+    {
+        return direction switch
+        {
+            "N" => Quaternion.Euler(0, -90, 0),
+            "E" => Quaternion.Euler(0, 0, 0),
+            "S" => Quaternion.Euler(0, 90, 0),
+            "W" => Quaternion.Euler(0, 180, 0),
+            _ => Quaternion.identity
+        };
+    }
+
+    private GameObject GetPlanePrefabFromColor(string color)
+    {
+        return color switch
+        {
+            "B" => bluePlanePrefab,
+            "R" => redPlanePrefab,
+            "G" => greenPlanePrefab,
+            "Y" => yellowPlanePrefab,
+            _ => null
+        };
     }
     //
     public Tile GetTileAtPos(int x, int y)
@@ -112,51 +119,53 @@ public class GridManager : MonoBehaviour
     //
     private void GenerateGrid()
     {
-        var i=0;
-        for (var x = 0; x < numRows; x++) {
-            for (var z = 0; z < numCols; z++)
+        for (var x = 0; x < NumRows; x++)
+        {
+            for (var z = 0; z < NumCols; z++)
             {
-                var tileData = _level.colored_tiles[i];
-                var usedTilePrefab = tileData.color switch
-                {
-                    "B" => blueTilePrefab,
-                    "R" => redTilePrefab,
-                    "G" => greenTilePrefab,
-                    "Y" => yellowTilePrefab,
-                    "E" => tilePrefab,
-                    _ => null
-                };
+                var tileData = _level.colored_tiles[x * NumCols + z];
+                var usedTilePrefab = GetTilePrefabFromColor(tileData.color);
                 
                 _tiles[x, z] = Instantiate(usedTilePrefab, new Vector3(x * gridSpaceSize, 0, z * gridSpaceSize),
                     Quaternion.identity, transform).GetComponent<Tile>();
                
                 _tiles[x, z].isColored = usedTilePrefab != tilePrefab;
-                
                 _tiles[x, z].InitTile(x, z);
-                _tiles[x, z].gameObject.name = "Tile ( X: " + x + " , Y: " + z + ")";
-                
-                i += 1;
+                _tiles[x, z].gameObject.name = $"Tile ( X: {x} , Y: {z})";
             }
         }
-        //
-        for (var y = 0; y < numCols; y++)
+
+        SetupNeighbors();
+    }
+
+    private GameObject GetTilePrefabFromColor(string color)
+    {
+        return color switch
         {
-            for (var x = 0; x < numRows; x++)
+            "B" => blueTilePrefab,
+            "R" => redTilePrefab,
+            "G" => greenTilePrefab,
+            "Y" => yellowTilePrefab,
+            "E" => tilePrefab,
+            _ => null
+        };
+    }
+
+    private void SetupNeighbors()
+    {
+        for (var y = 0; y < NumCols; y++)
+        {
+            for (var x = 0; x < NumRows; x++)
             {
                 var neighbors = new List<Tile>();
-                if (y < numCols-1)
-                    neighbors.Add(_tiles[x, y + 1]);
-                if (x < numRows-1)
-                    neighbors.Add(_tiles[x + 1, y]);
-                if (y > 0)
-                    neighbors.Add(_tiles[x, y - 1]);
-                if (x > 0)
-                    neighbors.Add(_tiles[x - 1, y]);
+                if (y < NumCols - 1) neighbors.Add(_tiles[x, y + 1]);
+                if (x < NumRows - 1) neighbors.Add(_tiles[x + 1, y]);
+                if (y > 0) neighbors.Add(_tiles[x, y - 1]);
+                if (x > 0) neighbors.Add(_tiles[x - 1, y]);
 
-                neighborDictionary.Add(_tiles[x, y], neighbors.ToArray());
+                _neighborDictionary.Add(_tiles[x, y], neighbors.ToArray());
             }
         }
-        //
     }
     
     private void IsSuccess()
