@@ -65,7 +65,7 @@ public class GridManager : MonoBehaviour
 
     private void SpawnPlanes()
     {
-        Vector3 gridCenter = new Vector3((NumRows - 1) * gridSpaceSize / 2, 0, (NumCols - 1) * gridSpaceSize / 2);
+        Vector3 gridCenter = CalculateGridCenter();
         Vector3 offset = -gridCenter;
 
         foreach (var planeData in _level.planes)
@@ -109,9 +109,14 @@ public class GridManager : MonoBehaviour
             _ => null
         };
     }
+    private Vector3 CalculateGridCenter()
+    {
+        return new Vector3((NumRows - 1) * gridSpaceSize / 2, 0, (NumCols - 1) * gridSpaceSize / 2);
+    }
+
     private void GenerateGrid()
     {
-        Vector3 gridCenter = new Vector3((NumRows - 1) * gridSpaceSize / 2, 0, (NumCols - 1) * gridSpaceSize / 2);
+        Vector3 gridCenter = CalculateGridCenter();
         Vector3 offset = -gridCenter;
 
         for (var x = 0; x < NumRows; x++)
