@@ -167,8 +167,26 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-    
-    private void IsSuccess()
+
+    /// <summary>
+    /// Gets the tile at the specified position.
+    /// </summary>
+    /// <param name="x">The x-coordinate of the tile.</param>
+    /// <param name="y">The y-coordinate of the tile.</param>
+    /// <returns>The tile at the specified position.</returns>
+    public Tile GetTileAtPos(int x, int y) => _tiles[x, y];
+
+    /// <summary>
+    /// Removes a plane from the game and checks for level completion.
+    /// </summary>
+    /// <param name="plane">The plane to remove.</param>
+    public void RemovePlane(Plane plane)
+    {
+        _planes.Remove(plane);
+        CheckLevelCompletion();
+    }
+
+    private void CheckLevelCompletion()
     {
         if (_planes.Count == 0)
         {
@@ -178,9 +196,8 @@ public class GridManager : MonoBehaviour
 
     private static void PlayNextLevel()
     {
-        LevelIndex += 1;
+        LevelIndex++;
         PlayerPrefs.SetInt("LevelIndex", LevelIndex);
         SceneManager.LoadScene("Gameplay");
     }
-    
 }
