@@ -105,18 +105,6 @@ public class GridManager : MonoBehaviour
             _ => null
         };
     }
-    //
-    public Tile GetTileAtPos(int x, int y)
-    {
-        return _tiles[x, y];
-    }
-
-    public void RemovePlane(Plane plane)
-    {
-        _planes.Remove(plane);
-        IsSuccess();
-    } 
-    //
     private void GenerateGrid()
     {
         for (var x = 0; x < NumRows; x++)
@@ -183,10 +171,10 @@ public class GridManager : MonoBehaviour
     public void RemovePlane(Plane plane)
     {
         _planes.Remove(plane);
-        CheckLevelCompletion();
+        IsSuccess();
     }
 
-    private void CheckLevelCompletion()
+    private void IsSuccess()
     {
         if (_planes.Count == 0)
         {
