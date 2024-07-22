@@ -14,8 +14,8 @@ public class Plane : MonoBehaviour
     private Tile endTile;
     private int lastPosX;
     private int lastPosY;
-    private   int numRows;
-    private   int numCols;
+    private int numRows;
+    private int numCols;
 
     private Vector3 lastPos;
     private Vector3 endPos;
@@ -83,8 +83,8 @@ public class Plane : MonoBehaviour
             pathfinding = FindObjectOfType<Pathfinding>();
         }
 
-        numCols = GridManager.Instance.numCols;
-        numRows = GridManager.Instance.numRows;
+        numCols = GridManager.Instance.NumCols;
+        numRows = GridManager.Instance.NumRows;
         var startTile = GridManager.Instance.GetTileAtPos(_posX, _posY);
         var endPosX = _pDirection switch
         {
@@ -127,6 +127,6 @@ public class Plane : MonoBehaviour
         var path = pathfinding.Dijkstra(startTile, endTile);
         SetPath(path);
         
-        Debug.Log("On: "+_posX+" "+_posY+" Direction: " +_pDirection);
+        Debug.Log($"On: {_posX} {_posY} Direction: {_pDirection}");
     }
 }
