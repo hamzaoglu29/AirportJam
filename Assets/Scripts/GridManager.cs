@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;
 
 public class GridManager : MonoBehaviour
 {
+    // Add this line to import LevelData
+    using LevelData;
     public static GridManager Instance { get; private set; }
 
     [SerializeField] private GameObject tilePrefab;
