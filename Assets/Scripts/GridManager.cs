@@ -206,6 +206,12 @@ public class GridManager : MonoBehaviour
     private static void PlayNextLevel()
     {
         LevelIndex++;
+        // Check if the next level exists
+        if (Resources.Load<TextAsset>($"Levels/level{LevelIndex}") == null)
+        {
+            // If it doesn't exist, reset to level 1
+            LevelIndex = 1;
+        }
         PlayerPrefs.SetInt("LevelIndex", LevelIndex);
         SceneManager.LoadScene("Gameplay");
     }
