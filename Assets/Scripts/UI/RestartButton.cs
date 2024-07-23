@@ -4,12 +4,32 @@ using UnityEngine.UI;
 
 public class RestartButton : MonoBehaviour
 {
-    private void Awake()
+    private void Start()
     {
-        GetComponent<Button>().onClick.AddListener(OnButtonClicked);
+        Button button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.AddListener(OnButtonClicked);
+            Debug.Log("Restart button initialized successfully.");
+        }
+        else
+        {
+            Debug.LogError("Button component not found on the RestartButton GameObject.");
+        }
     }
-    private static void OnButtonClicked()
+
+    private void OnButtonClicked()
     {
+        Debug.Log("Restart button clicked. Attempting to reload the Gameplay scene.");
         SceneManager.LoadScene("Gameplay");
+    }
+
+    private void OnDestroy()
+    {
+        Button button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.RemoveListener(OnButtonClicked);
+        }
     }
 }
