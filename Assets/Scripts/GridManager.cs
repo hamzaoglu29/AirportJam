@@ -51,7 +51,7 @@ public class GridManager : MonoBehaviour
     {
         LevelIndex = PlayerPrefs.GetInt("LevelIndex", LevelIndex);
         Debug.Log($"Attempting to load level: {LevelIndex}");
-        var levelFile = Resources.Load<TextAsset>($"Levels/level{LevelIndex}");
+        var levelFile = Resources.Load<TextAsset>($"Levels/level{LevelIndex}.txt");
         
         if (levelFile == null)
         {
@@ -59,7 +59,7 @@ public class GridManager : MonoBehaviour
             // If the level file doesn't exist, reset to level 1
             LevelIndex = 1;
             PlayerPrefs.SetInt("LevelIndex", LevelIndex);
-            levelFile = Resources.Load<TextAsset>("Levels/level1");
+            levelFile = Resources.Load<TextAsset>("Levels/level1.txt");
         }
         
         if (levelFile == null)
@@ -220,7 +220,7 @@ public class GridManager : MonoBehaviour
     {
         LevelIndex++;
         // Check if the next level exists
-        if (Resources.Load<TextAsset>($"Levels/level{LevelIndex}") == null)
+        if (Resources.Load<TextAsset>($"Levels/level{LevelIndex}.txt") == null)
         {
             // If it doesn't exist, reset to level 1
             LevelIndex = 1;
