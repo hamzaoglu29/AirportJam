@@ -50,20 +50,33 @@ public class GridManager : MonoBehaviour
     private void Start()
     {
         LevelIndex = PlayerPrefs.GetInt("LevelIndex", LevelIndex);
+        Debug.Log($"Attempting to load level: {LevelIndex}");
         var levelFile = Resources.Load<TextAsset>($"Levels/level{LevelIndex}");
         
         if (levelFile == null)
         {
+            Debug.LogWarning($"Level file for level {LevelIndex} not found. Resetting to level 1.");
             // If the level file doesn't exist, reset to level 1
             LevelIndex = 1;
             PlayerPrefs.SetInt("LevelIndex", LevelIndex);
             levelFile = Resources.Load<TextAsset>("Levels/level1");
         }
         
+        if (levelFile == null)
+        {
+            Debug.LogError("Failed to load any level file. Check your Resources folder.");
+            return;
+        }
+        
+        Debug.Log($"Successfully loaded level file: {levelFile.name}");
         _level = JsonUtility.FromJson<LevelData>(levelFile.text);
 
         NumRows = _level.row_count;
         NumCols = _level.column_count;
+        
+        Debug.Log($"Level dimensions: {NumRows}x{NumCols}");
+        Debug.Log($"Number of planes: {_level.planes.Count}");
+        Debug.Log($"Number of colored tiles: {_level.colored_tiles.Count}");
         
         _tiles = new Tile[NumRows, NumCols];
         _neighborDictionary = new Dictionary<Tile, Tile[]>();
