@@ -12,7 +12,7 @@ This project implements an engaging grid-based game with F35 planes. Key feature
 
 ## Installation
 
-1. Clone the repository: `git clone https://github.com/yourusername/AirportJam.git`
+1. Clone the repository: `git clone https://github.com/yourusername/AirportJam.git` (replace 'yourusername' with your actual GitHub username)
 2. Open the project in Unity (version 2021.3 or later)
 3. Navigate to Assets/Scenes and open the Gameplay scene
 
