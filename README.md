@@ -1,6 +1,6 @@
-# GridStrategyGame
+# AirportJam
 
-GridStrategyGame is a Unity-based strategy game featuring F35 planes on a grid-based system.
+AirportJam is a Unity-based strategy game featuring F35 planes on a grid-based system.
 
 ## Description
 
@@ -12,7 +12,7 @@ This project implements an engaging grid-based game with F35 planes. Key feature
 
 ## Installation
 
-1. Clone the repository: `git clone https://github.com/yourusername/GridStrategyGame.git`
+1. Clone the repository: `git clone https://github.com/yourusername/AirportJam.git`
 2. Open the project in Unity (version 2021.3 or later)
 3. Navigate to Assets/Scenes and open the Gameplay scene
 
@@ -26,7 +26,7 @@ This project implements an engaging grid-based game with F35 planes. Key feature
 
 ## Contributing
 
-We welcome contributions to GridStrategyGame! If you'd like to contribute:
+We welcome contributions to AirportJam! If you'd like to contribute:
 
 1. Fork the repository
 2. Create a new branch: `git checkout -b feature-branch-name`
