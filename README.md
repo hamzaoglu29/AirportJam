@@ -33,9 +33,8 @@ This project implements an engaging grid-based game with F35 planes. Key feature
 
 1. Start the game from the Unity editor or build and run the executable
 2. Select a level to begin
-3. Click on a plane to select it
-4. Click on a destination tile to move the plane
-5. Plan your moves strategically to complete the level objectives
+3. Click on a plane to move it
+4. Plan your moves strategically to complete the level objectives
 
 ## Contributing
 
