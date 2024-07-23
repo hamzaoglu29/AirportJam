@@ -51,6 +51,15 @@ public class GridManager : MonoBehaviour
     {
         LevelIndex = PlayerPrefs.GetInt("LevelIndex", LevelIndex);
         var levelFile = Resources.Load<TextAsset>($"Levels/level{LevelIndex}");
+        
+        if (levelFile == null)
+        {
+            // If the level file doesn't exist, reset to level 1
+            LevelIndex = 1;
+            PlayerPrefs.SetInt("LevelIndex", LevelIndex);
+            levelFile = Resources.Load<TextAsset>("Levels/level1");
+        }
+        
         _level = JsonUtility.FromJson<LevelData>(levelFile.text);
 
         NumRows = _level.row_count;
